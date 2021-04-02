@@ -33,7 +33,7 @@ jobs:
             var matchArtifacts = artifacts.data.artifacts.filter((artifact) => {
               return artifact.name == "build"
             });
-            if (matchArtifacts.length > 0) {
+            if (matchArtifacts.length === 0) {
               console.warn(
                 'No artifacts to download probably just means nothing ' +
                 'was built in the "PR test" workflow. That\'s OK. ' +
