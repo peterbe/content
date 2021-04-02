@@ -34,45 +34,44 @@ jobs:
               return artifact.name == "build"
             });
             if (matchArtifacts.length > 0) {
-              var matchArtifact = matchArtifacts[0];
-              var download = await github.actions.downloadArtifact({
-                 owner: context.repo.owner,
-                 repo: context.repo.repo,
-                 artifact_id: matchArtifact.id,
-                 archive_format: 'zip',
-              });
-              var fs = require('fs');
-              fs.writeFileSync('${{github.workspace}}/build.zip', Buffer.from(download.data));
-            } else {
+              console.warn(
+                'No artifacts to download probably just means nothing ' +
+                'was built in the "PR test" workflow. That\'s OK. ' +
+                'This is actually not a genuine CI error.'
+              );
               throw new Error('nothing to download');
             }
+            var matchArtifact = matchArtifacts[0];
+            var download = await github.actions.downloadArtifact({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                artifact_id: matchArtifact.id,
+                archive_format: 'zip',
+            });
+            var fs = require('fs');
+            fs.writeFileSync('${{github.workspace}}/build.zip', Buffer.from(download.data));
 
       - name: Unzip what was downloaded
-        if: steps.download.conclusion == 'success'
         run: |
           unzip build.zip -d build
 
       - uses: actions/checkout@v2
-        if: steps.download.conclusion == 'success'
         with:
            repository: mdn/yari
            path: yari
 
       - name: Install Python
-        if: steps.download.conclusion == 'success'
         uses: actions/setup-python@v2
         with:
           python-version: "3.8"
 
       - name: Install Python poetry
-        if: steps.download.conclusion == 'success'
         uses: snok/install-poetry@v1.1.1
         with:
           virtualenvs-create: true
           virtualenvs-in-project: true
 
       - name: Load cached venv
-        if: steps.download.conclusion == 'success'
         id: cached-poetry-dependencies
         uses: actions/cache@v2
         with:
@@ -80,13 +79,12 @@ jobs:
           key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
 
       - name: Install deployer
-        if: steps.download.conclusion == 'success' && steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
         run: |
           cd yari/deployer
           poetry install
 
       - name: Deploy and analyze built content
-        if: steps.download.conclusion == 'success'
         env:
           BUILD_OUT_ROOT: ${{ github.workspace }}/build
 
