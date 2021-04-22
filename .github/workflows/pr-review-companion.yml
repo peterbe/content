@@ -59,9 +59,7 @@ jobs:
 
       - uses: actions/checkout@v2
         with:
-          #  repository: mdn/yari
-           repository: peterbe/yari
-           ref: 3487-editupdate-comment-for-pr-review
+           repository: mdn/yari
            path: yari
 
       - name: Install Python
