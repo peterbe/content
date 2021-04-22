@@ -22,7 +22,6 @@ jobs:
     steps:
       - name: 'Download artifact'
         uses: actions/github-script@v3
-        id: download
         with:
           script: |
             var artifacts = await github.actions.listWorkflowRunArtifacts({
@@ -39,7 +38,10 @@ jobs:
                 'was built in the "PR test" workflow. That\'s OK. ' +
                 'This is actually not a genuine CI error.'
               );
-              throw new Error('nothing to download');
+              throw new Error(
+                'No matched build artifacts. ' +
+                'Perhaps nothing built in the "PR test" workflow'
+              );
             }
             var matchArtifact = matchArtifacts[0];
             var download = await github.actions.downloadArtifact({
@@ -66,7 +68,7 @@ jobs:
           python-version: "3.8"
 
       - name: Install Python poetry
-        uses: snok/install-poetry@v1.1.1
+        uses: snok/install-poetry@v1.1.4
         with:
           virtualenvs-create: true
           virtualenvs-in-project: true
@@ -76,28 +78,42 @@ jobs:
         uses: actions/cache@v2
         with:
           path: yari/deployer/.venv
-          key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
+          key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}-${{ hashFiles('.github/workflows/pr-review-companion.yml') }}
 
-      - name: Install deployer
+      - name: Install poetry dependencies
         if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
         run: |
           cd yari/deployer
-          poetry install
+          poetry install --no-interaction --no-root
+
+      - name: Install Deployer
+        run: |
+          cd yari/deployer
+          poetry install --no-interaction
 
       - name: Deploy and analyze built content
         env:
           BUILD_OUT_ROOT: ${{ github.workspace }}/build
 
           DEPLOYER_BUCKET_NAME: mdn-content-dev
-          AWS_ACCESS_KEY_ID: ${{ secrets.DEPLOYER_STAGE_AND_DEV_AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.DEPLOYER_STAGE_AND_DEV_AWS_SECRET_ACCESS_KEY }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.DEPLOYER_DEV_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.DEPLOYER_DEV_AWS_SECRET_ACCESS_KEY }}
           DEPLOYER_LOG_EACH_SUCCESSFUL_UPLOAD: false
 
         run: |
           PR_NUMBER=`cat build/NR`
 
+          echo "Pull request:"
+          echo "https://github.com/mdn/content/pull/$PR_NUMBER"
+
           cd yari/deployer
-          poetry run deployer upload --prefix="pr$PR_NUMBER" --no-redirects "$BUILD_OUT_ROOT"
+
+          poetry run deployer upload \
+            --prefix="pr$PR_NUMBER" \
+            --no-redirects \
+            --default-cache-control 0 \
+            "$BUILD_OUT_ROOT"
+
           poetry run deployer analyze-pr-build \
             --prefix="pr$PR_NUMBER" \
             --analyze-flaws --analyze-dangerous-content \
