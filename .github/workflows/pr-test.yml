@@ -110,6 +110,10 @@ jobs:
           # Save the PR number into the build
           echo ${{ github.event.number }} > build/NR
 
+          git remote -v
+          git diff origin/main HEAD
+          git diff origin/main HEAD > build/DIFF
+
       - name: Merge static assets with built documents
         if: ${{ env.GIT_DIFF_CONTENT }}
         run: |
