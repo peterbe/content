@@ -111,8 +111,8 @@ jobs:
           echo ${{ github.event.number }} > build/NR
 
           git remote -v
-          git diff main HEAD
-          git diff main HEAD > build/DIFF
+          git diff --diff-filter=ACMRT ${{ github.event.pull_request.base.sha }} ${{ github.sha }}
+          git diff --diff-filter=ACMRT ${{ github.event.pull_request.base.sha }} ${{ github.sha }} > build/DIFF
 
       - name: Merge static assets with built documents
         if: ${{ env.GIT_DIFF_CONTENT }}
