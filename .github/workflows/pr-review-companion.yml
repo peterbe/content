@@ -59,7 +59,9 @@ jobs:
 
       - uses: actions/checkout@v2
         with:
-           repository: mdn/yari
+          #  repository: mdn/yari
+           repository: peterbe/yari
+           ref: fix-editing-of-comment-in-review-companion
            path: yari
 
       - name: Install Python
@@ -116,8 +118,10 @@ jobs:
 
           poetry run deployer analyze-pr-build \
             --prefix="pr$PR_NUMBER" \
-            --analyze-flaws --analyze-dangerous-content \
+            --analyze-flaws \
+            --analyze-dangerous-content \
             --github-token="${{secrets.GITHUB_TOKEN}}" \
             --repo=$GITHUB_REPOSITORY \
             --pr-number=$PR_NUMBER \
+            --diff-file=$BUILD_OUT_ROOT/DIFF \
             $BUILD_OUT_ROOT

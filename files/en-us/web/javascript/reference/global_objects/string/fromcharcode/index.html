@@ -8,6 +8,7 @@ tags:
 - String
 - UTF-16
 - Unicode
+browser-compat: javascript.builtins.String.fromCharCode
 ---
 <div>{{JSRef}}</div>
 
@@ -19,8 +20,11 @@ tags:
 
 <h2 id="Syntax">Syntax</h2>
 
-<pre
-  class="brush: js">String.fromCharCode(<var>num1</var>[, ...[, <var>numN</var>]])</pre>
+<pre class="brush: js">
+String.fromCharCode(num1)
+String.fromCharCode(num1, num2)
+String.fromCharCode(num1, num2, ..., numN)
+</pre>
 
 <h3 id="Parameters">Parameters</h3>
 
@@ -95,22 +99,11 @@ String.fromCharCode(0xD834, 0xDF06, 0x61, 0xD834, 0xDF07); // "\uD834\uDF06a\uD8
 
 <h2 id="Specifications">Specifications</h2>
 
-<table class="standard-table">
-  <thead>
-    <tr>
-      <th scope="col">Specification</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>{{SpecName('ESDraft', '#sec-string.fromcharcode', 'String.fromCharCode')}}</td>
-    </tr>
-  </tbody>
-</table>
+{{Specifications}}
 
 <h2 id="Browser_compatibility">Browser compatibility</h2>
 
-<p>{{Compat("javascript.builtins.String.fromCharCode")}}</p>
+<p>{{Compat}}</p>
 
 <h2 id="See_also">See also</h2>
 
