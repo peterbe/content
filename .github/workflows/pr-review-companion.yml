@@ -116,7 +116,7 @@ jobs:
             --default-cache-control 0 \
             "$BUILD_OUT_ROOT"
 
-          poetry run deployer analyze-pr-build \
+          poetry run deployer --verbose analyze-pr-build \
             --prefix="pr$PR_NUMBER" \
             --analyze-flaws \
             --analyze-dangerous-content \
