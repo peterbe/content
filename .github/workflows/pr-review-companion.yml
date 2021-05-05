@@ -59,7 +59,9 @@ jobs:
 
       - uses: actions/checkout@v2
         with:
-           repository: mdn/yari
+          #  repository: mdn/yari
+           repository: peterbe/yari
+           ref: fix-editing-of-comment-in-review-companion
            path: yari
 
       - name: Install Python
