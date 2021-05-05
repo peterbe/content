@@ -213,7 +213,7 @@ setInterval(function run() {
 <p>The difference between the two versions of the above code is a subtle one.</p>
 
 <ul>
- <li>Recursive <code>setTimeout()</code> guarantees the same delay between the executions. (For example, <code>100</code>ms in the above case.) The code will run, then wait <code>100</code> milliseconds before it runs again—so the interval will be the same, regardless of how long the code takes to run.</li>
+ <li>Recursive <code>setTimeout()</code> guarantees the given delay between the code execution completion and the next call. The delay for the next execution will start counting only after the code has finished running, therefore <em>excluding</em> the time taken to run the code. In this example, the <code>100</code> milliseconds will be the delay between the <code>run</code> code finishing, and the next <code>run</code> call.</li>
  <li>The example using <code>setInterval()</code> does things somewhat differently. The interval you chose <em>includes</em> the time taken to execute the code you want to run in. Let's say that the code takes <code>40</code> milliseconds to run — the interval then ends up being only <code>60</code> milliseconds.</li>
  <li>When using <code>setTimeout()</code> recursively, each iteration can calculate a different delay before running the next iteration. In other words, the value of the second parameter can specify a different time in milliseconds to wait before running the code again.</li>
 </ul>
@@ -242,9 +242,9 @@ alert('Hello');</pre>
 
 <h2 id="requestAnimationFrame">requestAnimationFrame()</h2>
 
-<p><code><a href="/en-US/docs/Web/API/window/requestAnimationFrame">requestAnimationFrame()</a></code> is a specialized looping function created for running animations efficiently in the browser. It is basically the modern version of <code>setInterval()</code> — it executes a specified block of code before the browser next repaints the display, allowing an animation to be run at a suitable frame rate regardless of the environment it is being run in.</p>
+<p><code><a href="/en-US/docs/Web/API/window/requestAnimationFrame">requestAnimationFrame()</a></code> is a specialized enqueueing function created for running animations efficiently in the browser. It runs a specified block of code before the browser next repaints the display, allowing the execution to be paired with the device's display frame rate.</p>
 
-<p>It was created in response to perceived problems with <code>setInterval()</code>, which for example doesn't run at a frame rate optimized for the device, sometimes drops frames, continues to run even if the tab is not the active tab or the animation is scrolled off the page, etc.</p>
+<p>It was created in response to perceived problems with previous async functions like <code>setInterval()</code>, which for example doesn't run at a frame rate optimized for the device, dropping frames in some cases. They also lacked some optimizations suited for animations, like stopping the execution if the tab isn't active or the animation is scrolled off the page, among other things.</p>
 
 <p>(<a href="http://creativejs.com/resources/requestanimationframe/index.html">Read more about this on CreativeJS</a>.)</p>
 
