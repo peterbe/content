@@ -42,14 +42,17 @@ jobs:
         run: |
           yarn --frozen-lockfile
 
+      - uses: technote-space/get-diff-action@v4.1.1
+        id: git_diff_content
+        with:
+          PATTERNS: files/**/*.html
+          SET_ENV_NAME: GIT_DIFF_CONTENT
+
       - name: Escape HTML tags in frontmatter
-        # On macOS it is:
-        # find files/en-us/ -name 'index.html' -type f -exec sed -i '' 's/^title:.*<.*/title:/; s/^  - <.*/  -/' {} \;
-        # from https://stackoverflow.com/a/57766728/455535
         run: |
-          find files/en-us/ -name 'index.html' -type f -exec sed -i 's/^title:.*<.*/title:/; s/^  - <.*/  -/' {} \;
+          node scripts/escape-front-matter-html.js ${{ env.GIT_DIFF_CONTENT }}
 
       - name: HTML Validator
         run: |
           echo "::add-matcher::.github/workflows/vnu-jar-problem-matcher.json"
-          yarn vnu-jar
+          yarn vnu-jar ${{ env.GIT_DIFF_CONTENT }}
